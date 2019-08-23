@@ -7,7 +7,8 @@ import './Admin.css';
 
 export default function Admin() {
     const [users, setUsers] = useState([]);
-
+    const [turmas, setTurmas] = useState([]);
+    
     useEffect(()=>{
         async function loadAlunos() {
             const response = await api.get('/alunos');
@@ -15,6 +16,23 @@ export default function Admin() {
         }
         loadAlunos();
     }, []);
+
+    useEffect(()=>{
+        function loadTurmas() {
+            let turmas_id = [];
+            users.map(user=>{
+                user.turmas.map(turma=>{
+                    return turmas_id.push(turma);
+                })
+            });
+
+            let j = [...new Set(turmas_id)]
+            setTurmas(j);
+        }
+        if(users) {
+            loadTurmas();
+        }
+    },[users]);
 
     async function refresh() {
         const response = await api.get('/alunos');
@@ -46,7 +64,10 @@ export default function Admin() {
 
     async function handleCreate() {
         let nome = document.getElementById('novoAluno').value;
-        await api.post('/alunos', {name: nome});
+        let turma = document.getElementById('turmaAluno').value;
+        await api.post('/alunos', {name: nome, turmas: [turma]});
+        document.getElementById('novoAluno').value = '';
+        document.getElementById('turmaAluno').value = '';
         refresh();
     }
 
@@ -57,7 +78,13 @@ export default function Admin() {
             <div className="cardsContainer">
                 <p className="card novoAluno">
                     <input type="text" id="novoAluno" placeholder="qual o nome do aluno?"/>
+                    <input type="text" id="turmaAluno" placeholder="qual a turma do aluno?"/>
                     <button onClick={handleCreate}>Novo Aluno</button>
+                </p>
+                <p className="turmas">
+                {turmas.map(item => {
+                    return <button className="botoesDeTurma">{item[0]}</button>;
+                })}
                 </p>
                 {users.length>0?(<div className="cardsContainer">
                     {users.map(user=>(

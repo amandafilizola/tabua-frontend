@@ -1,7 +1,7 @@
 import axios from 'axios';
-const url = 'https://tabua-backend.herokuapp.com';
+const url = 'http://localhost:3333';
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL
+    baseURL: url
 })
 export default api
